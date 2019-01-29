@@ -14,6 +14,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "psql" do |psql|
     psql.vm.network "private_network", ip: "192.168.100.9"
+    psql.vm.provision "shell", path: "psql-setup.sh"
   end
 
   config.vm.define "kafka" do |kafka|
@@ -22,9 +23,10 @@ Vagrant.configure(2) do |config|
     end
     kafka.vm.network "private_network", ip: "192.168.100.10"
     kafka.vm.provision "file", source: "connect-distributed.properties", destination: "connect-distributed.properties"
-    kafka.vm.provision "file", source: "kafka-setup.sh", destination: "kafka-setup.sh"
-    kafka.vm.provision "file", source: "schema-registry-setup.sh", destination: "schema-registry-setup.sh"
-    kafka.vm.provision "file", source: "debezium-setup.sh", destination: "debezium-setup.sh"
+    kafka.vm.provision "file", source: "confluent.tgz", destination: "confluent.tgz"
+    kafka.vm.provision "shell", path: "kafka-setup.sh"
+    kafka.vm.provision "shell", path: "schema-registry-setup.sh"
+    kafka.vm.provision "shell", path: "debezium-setup.sh"
   end
 
 end

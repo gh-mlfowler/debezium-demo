@@ -7,7 +7,7 @@ This project builds a three node cluster:
 * Kafka
 
 To begin, run `vagrant up`. The boxes are created and configured in order such that once they are all running, Debezium will have read all the data
- in MySQL, written it to Kafka and the JDBC sink will have written it to PostgreSQL. You can then connect to individual nodes and explore.
+ in MySQL, written it to Kafka and the JDBC sink will have written it to PostgreSQL. You can then connect to individual nodes (e.g. `vagrant ssh psql`) and explore. Once you're finised, run `vagrant destroy` to clear everything down.
 
 ## MySQL
 
@@ -45,4 +45,14 @@ This box will take a while to provison owing to the amount of Java dependencies 
 
 The moment the MySQL source is configured, Debezium will connect to the database, read the schema and then fetch the data for each table and place it on the appropriate topics in Kafka. The log file `connect-distributed.out` is quite detailed and notes the time it takes for each stage to complete. Of particular interest is how long an exclusive lock on the database was required for the inital schema parse.
 
-The PostgeSQL sink is for the single table `actor`. As soon as data is present, the schema will be taken from the Schema Registry, a table created in PostgreSQL and then loaded with the data. 
+The PostgeSQL sink is for the single table `actor`. As soon as data is present, the schema will be taken from the Schema Registry, a table created in PostgreSQL and then loaded with the data. To verify this has worked, you should fined 200 rows in the actor table.
+
+```
+$ vagrant ssh psql -c "PGPASSWORD=sakila psql -h 127.0.0.1 -U sakila sakila -c 'SELECT COUNT(*) FROM actor;'"
+ count
+-------
+   200
+(1 row)
+
+Connection to 127.0.0.1 closed.
+```
